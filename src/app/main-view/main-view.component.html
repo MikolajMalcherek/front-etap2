@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sidebar Menu HTML and CSS | Chat Application</title>
+  <!-- Linking Google Font Link For Icons -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Chat Application</h2>
+      </div>
+      <ul class="sidebar-links">
+        <h4>
+          <span>All users</span>
+          <div class="menu-separator"></div>
+        </h4>
+        <!-- Wyswietlanie listy uzytkownikow -->
+        <li *ngFor="let user of users" (click)="beginChat(user)">
+          <span>{{ user.username }}</span>
+        </li>
+      </ul>
+      <div class="user-account">
+        <div class="user-profile">
+          <div class="user-detail">
+            <h3> Logged as: {{username}} </h3>
+          </div>
+        </div>
+      </div>
+      <div class="logout">
+        <li (click)="logout()">
+          <a>
+            Logout
+          </a>
+        </li>
+      </div>
+    </aside>
+
+    <main class="chat-view">
+      <div *ngIf="chat" class="chat-header">
+        <h3>Chat with {{ chat.user2.username }}</h3>
+      </div>
+      <div *ngIf="chat" class="chat-messages">
+        <div *ngFor="let message of chat.messages" [class.sent]="message.sender.id === userid" [class.received]="message.sender.id !== userid">
+          <span>{{ message.message }}</span>
+        </div>
+      </div>
+      <div *ngIf="chat" class="chat-input">
+        <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." />
+        <button (click)="sendMessage()" >Send</button>
+      </div>
+      <div *ngIf="!chat" class="no-chat-selected">
+        <p>Select a user to start chatting</p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

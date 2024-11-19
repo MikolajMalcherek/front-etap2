@@ -1,0 +1,120 @@
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
+
+interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
+@Component({
+  selector: 'app-callback',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './callback.component.html',
+  styleUrl: './callback.component.scss'
+})
+export class CallbackComponent {
+  isLoading = true; // Dodajemy zmienną do kontrolowania ładowania
+
+  constructor(
+    private route: ActivatedRoute, 
+    private http: HttpClient, 
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private userService: UserService
+  ) { }
+
+  ngOnInit(): void {
+    console.log("Inside callback page");
+    this.route.queryParams.subscribe(params => {
+      const code = params['code'];
+      console.log('Received code: ', code);
+      if (code) {
+        this.http.get<TokenResponse>('http://localhost:8080/callback', {
+          params: {code},
+        })
+          .subscribe(response => {
+            console.log('Backend response: ', response);
+
+            const token = response.access_token;
+            const refresh_token = response.refresh_token;
+            console.log("Token: " + token);
+            console.log("RefreshToken: " + refresh_token);
+
+            if (token) {
+              // Sprawdzamy, czy jesteśmy w przeglądarce
+              if (isPlatformBrowser(this.platformId)) {
+                console.log('Running in browser, saving tokens');
+                localStorage.setItem('auth_token', token);
+                localStorage.setItem('refresh_token', refresh_token);
+              } else {
+                console.error("localStorage is not available in the environment!");
+              }
+            } else {
+              console.error('Token not found in response.');
+              this.redirectToBadLogin();
+            }
+
+            const username = this.getUsernameFromToken(token);
+            
+            if (username) {
+              this.userService.setUsername(username);
+              this.http.post<TokenResponse>('http://localhost:8080/api/users/create', {
+                username: username
+              })
+              .subscribe(
+                response => {
+                  // Obsługuje odpowiedź
+                  console.log('User created:');
+                },
+                error => {
+                  // Obsługuje błąd
+                  console.error('User exists already');
+                }
+              );
+            }
+
+            this.router.navigate(['/main-view']);
+            this.isLoading = false; // Wyłącz spinner po zakończeniu ładowania
+          }, error => {
+            console.error('Error during token exchange: ', error);
+            this.redirectToBadLogin();
+            this.isLoading = false; // Wyłącz spinner po błędzie
+          });
+      } else {
+        this.redirectToBadLogin();
+        this.isLoading = false; // Wyłącz spinner, jeśli brak kodu
+      }
+    });
+  }
+
+  private redirectToBadLogin(): void {
+    const clientId = '4u16sf8bhgdvjdf01b3uccgo8u';
+    const logoutUrl = `https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout`;
+    const redirectUri = `http://localhost:4200/bad-login`;
+
+    if (isPlatformBrowser(this.platformId)) {
+      const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?client_id=4u16sf8bhgdvjdf01b3uccgo8u&logout_uri=http://localhost:4200/bad-login';
+      window.location.href = logoutUrl;
+    }
+  }
+
+  getUsernameFromToken(token: string): string | null {
+    try {
+      const payload = token.split('.')[1]; // Część payload tokenu
+      const decodedPayload = atob(payload); // Dekodowanie base64
+      const parsedPayload = JSON.parse(decodedPayload); // Parsowanie JSON
+  
+      // Zwrócenie wartości pola "username"
+      return parsedPayload.username || null;
+    } catch (error) {
+      console.error('Błąd podczas dekodowania tokenu', error);
+      return null;
+    }
+  }
+  
+}

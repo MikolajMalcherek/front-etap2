@@ -1,0 +1,27 @@
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3); /* Tło spinnera */
+    border-top: 4px solid #3498db; /* Kolor górnej części spinnera */
+    border-radius: 50%; /* Zaokrąglenie, aby utworzyć okrąg */
+    width: 40px; /* Szerokość */
+    height: 40px; /* Wysokość */
+    animation: spin 1s linear infinite; /* Animacja kręcenia spinnerem */
+    margin: 50px auto; /* Wyśrodkowanie spinnera */
+  }
+  
+  /* Animacja kręcenia spinnera */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    flex-direction: column;
+}

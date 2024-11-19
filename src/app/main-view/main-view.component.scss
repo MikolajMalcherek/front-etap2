@@ -1,0 +1,274 @@
+/* Importing Google font - Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: #F0F4FF;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 85px;
+  display: flex;
+  overflow-x: hidden;
+  flex-direction: column;
+  background: #161a2d;
+  padding: 25px 20px;
+  transition: all 0.4s ease;
+}
+
+.chat-view {
+  flex-grow: 1;
+  padding: 20px;
+  margin-left: 85px; /* Dopasowane do szerokości zwiniętego sidebar */
+  transition: margin-left 0.4s ease; /* Wyrównanie podczas rozszerzania sidebar */
+  flex-direction: column;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  overflow: hidden;
+}
+
+.chat-messages {
+  height: calc(100vh - 150px); /* Maksymalna wysokość */
+  overflow-y: auto; /* Pojawi się pasek przewijania, jeśli wiadomości przekroczą wysokość */
+  padding: 20px;
+  background-color: #ebebeb; /* Tło pola */
+  border: 2px solid #ababab;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar:hover ~ .chat-view {
+  margin-left: 260px; /* Dopasowane do rozszerzonego sidebar */
+}
+
+.sidebar:hover {
+  width: 260px;
+}
+
+.sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar .sidebar-header img {
+  width: 42px;
+  border-radius: 50%;
+}
+
+.sidebar .sidebar-header h2 {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: 23px;
+}
+
+.sidebar-links h4 {
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+  margin: 10px 0;
+  position: relative;
+}
+
+.sidebar-links h4 span {
+  opacity: 0;
+}
+
+.sidebar:hover .sidebar-links h4 span {
+  opacity: 1;
+}
+
+.sidebar-links .menu-separator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  transform: scaleX(1);
+  transform: translateY(-50%);
+  background: #4f52ba;
+  transform-origin: right;
+  transition-delay: 0.2s;
+}
+
+.sidebar:hover .sidebar-links .menu-separator {
+  transition-delay: 0s;
+  transform: scaleX(0);
+}
+
+.sidebar-links {
+  list-style: none;
+  margin-top: 20px;
+  height: 80%;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sidebar-links::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar-links li span {
+  display: flex;
+  align-items: center;
+  gap: 0 20px;
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 15px 10px;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.sidebar-links li span:hover {
+  color: #161a2d;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.user-account {
+  margin-top: auto;
+  padding: 12px 10px;
+  margin-left: -10px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  color: #161a2d;
+}
+
+.user-profile img {
+  width: 42px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.user-profile h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.user-profile span {
+  font-size: 0.775rem;
+  font-weight: 600;
+}
+
+.user-detail {
+  margin-left: 23px;
+  white-space: nowrap;
+}
+
+.sidebar:hover .user-account {
+  background: #fff;
+  border-radius: 4px;
+}
+
+.logout li a{
+  display: flex;
+  align-items: center;
+  gap: 0 20px;
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 15px 10px;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.logout li a:hover {
+  color: #161a2d;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.sent {
+  display: inline-flex; /* Dopasowuje szerokość tła do tekstu */
+  text-align: right;
+  background-color: #70dcf8;
+  padding: 8px 15px;
+  margin: 5px;
+  border-radius: 8px;
+  max-width: 100%; /* Zapewnia, że element nie wyjdzie poza kontener */
+  word-wrap: break-word; /* Zapobiega zawijaniu się tekstu na zewnątrz */
+}
+
+.received {
+  display: inline-flex; /* Dopasowuje szerokość tła do tekstu */
+  text-align: right;
+  background-color: rgb(181, 250, 189);
+  padding: 8px 15px;
+  margin: 5px;
+  border-radius: 8px;
+  max-width: 100%; /* Zapewnia, że element nie wyjdzie poza kontener */
+  word-wrap: break-word; /* Zapobiega zawijaniu się tekstu na zewnątrz */
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 2px solid #ddd;
+  background-color: #f9f9f9;
+}
+
+.chat-input input{
+  flex-grow: 1; /* Rozciąga się na całą dostępną szerokość */
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  resize: none; /* Wyłącz ręczne zmienianie rozmiaru */
+  overflow: hidden; 
+
+}
+
+.chat-input button {
+  padding: 12px 20px;
+  background-color: #4f52ba;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.chat-input button:hover {
+  background-color: #3e4199;
+  transform: scale(1.05);
+}
+
+.chat-input button:active {
+  background-color: #2c2e73;
+}
+
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 100px); /* Wysokość kontenera - miejsce na header i padding */
+  border: 2px solid #ddd; /* Ramka wokół kontenera */
+  border-radius: 12px; /* Zaokrąglenie rogów */
+  background-color: #f9f9f9; /* Tło pola */
+  overflow: hidden;
+}
