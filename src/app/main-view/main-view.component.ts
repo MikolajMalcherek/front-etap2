@@ -7,6 +7,7 @@ import { ChatService, Chat } from '../../services/chat.service';
 import { Message, MessageResponse } from '../../services/message.service';
 import { FormsModule } from '@angular/forms';
 import { WebsocketService } from '../../services/websocket.service';
+import { TokenService } from '../../services/token.service';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class MainViewComponent implements OnInit, AfterViewInit{
     private userService: UserService,
     private chatService: ChatService,
     private websocketService: WebsocketService,
+    private tokenService: TokenService,
   ) {}
 
 
@@ -116,6 +118,7 @@ export class MainViewComponent implements OnInit, AfterViewInit{
       console.error('User ID or logged-in ID is missing');
     }
     this.websocketService.connect();
+    console.log("Token in sessionStorage: ",this.tokenService.getToken())
   }
 
   sendMessage(): void {
@@ -151,6 +154,7 @@ export class MainViewComponent implements OnInit, AfterViewInit{
   logout(): void {
     const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?response_type=code&client_id=1gqfmkoltk4vqlqriqubp3pd5c&logout_uri=http://localhost:4200/loginclick';
       window.location.href = logoutUrl;
+      this.tokenService.removeToken();
   }
   
 

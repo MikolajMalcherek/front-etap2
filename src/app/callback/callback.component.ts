@@ -1,9 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { TokenService } from '../../services/token.service';
 
 interface TokenResponse {
   access_token: string;
@@ -17,7 +18,7 @@ interface TokenResponse {
   templateUrl: './callback.component.html',
   styleUrl: './callback.component.scss'
 })
-export class CallbackComponent {
+export class CallbackComponent{
   isLoading = true; // Dodajemy zmienną do kontrolowania ładowania
 
   constructor(
@@ -25,7 +26,8 @@ export class CallbackComponent {
     private http: HttpClient, 
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private userService: UserService
+    private userService: UserService,
+    private tokenService: TokenService,
   ) { }
 
   ngOnInit(): void {
@@ -48,9 +50,7 @@ export class CallbackComponent {
             if (token) {
               // Sprawdzamy, czy jesteśmy w przeglądarce
               if (isPlatformBrowser(this.platformId)) {
-                console.log('Running in browser, saving tokens');
-                localStorage.setItem('auth_token', token);
-                localStorage.setItem('refresh_token', refresh_token);
+                this.tokenService.setToken(token);
               } else {
                 console.error("localStorage is not available in the environment!");
               }
@@ -98,7 +98,7 @@ export class CallbackComponent {
     const redirectUri = `http://localhost:4200/bad-login`;
 
     if (isPlatformBrowser(this.platformId)) {
-      const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?client_id=4u16sf8bhgdvjdf01b3uccgo8u&logout_uri=http://localhost:4200/bad-login';
+      const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?response_type=code&client_id=1gqfmkoltk4vqlqriqubp3pd5c&logout_uri=http://localhost:4200/bad-login';
       window.location.href = logoutUrl;
     }
   }

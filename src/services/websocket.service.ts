@@ -20,11 +20,11 @@ export class WebsocketService {
 
     this.stompClient.connect({}, () => {
       console.log('Connected to WebSocket');
-      if (this.stompClient) {
-        this.stompClient.subscribe('/user/queue/messages', (message) => {
-          this.messagesSubject.next(JSON.parse(message.body));
-        });
-      }
+      // if (this.stompClient) {
+      //   this.stompClient.subscribe('/user/queue/messages', (message) => {
+      //     this.messagesSubject.next(JSON.parse(message.body));
+      //   });
+      // }
     });
   }
 
@@ -55,7 +55,7 @@ export class WebsocketService {
     // Subscribe specific chat
     subscribeToChat(chatId: number) {
       if (this.stompClient) {
-        this.stompClient.subscribe(`/chat/${chatId}`, (message) => {
+        this.stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
           console.log('New message for chat:', message.body);
           this.messagesSubject.next(JSON.parse(message.body));
         });
