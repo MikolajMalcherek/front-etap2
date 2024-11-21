@@ -5,6 +5,7 @@ import { Component, OnInit, Inject, PLATFORM_ID, AfterViewInit } from '@angular/
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { TokenService } from '../../services/token.service';
+import {HTTP_INTERCEPTORS } from '@angular/common/http';
 
 interface TokenResponse {
   access_token: string;
@@ -40,20 +41,17 @@ export class CallbackComponent{
           params: {code},
         })
           .subscribe(response => {
-            console.log('Backend response: ', response);
+            // console.log('Backend response: ', response);
 
             const token = response.access_token;
             const refresh_token = response.refresh_token;
-            console.log("Token: " + token);
-            console.log("RefreshToken: " + refresh_token);
+            // console.log("Token: " + token);
+            // console.log("RefreshToken: " + refresh_token);
 
             if (token) {
               // Sprawdzamy, czy jesteśmy w przeglądarce
-              if (isPlatformBrowser(this.platformId)) {
                 this.tokenService.setToken(token);
-              } else {
-                console.error("localStorage is not available in the environment!");
-              }
+
             } else {
               console.error('Token not found in response.');
               this.redirectToBadLogin();
@@ -69,6 +67,7 @@ export class CallbackComponent{
               .subscribe(
                 response => {
                   // Obsługuje odpowiedź
+                  console.log("Token z session storage",this.tokenService.getToken())
                   console.log('User created:');
                 },
                 error => {

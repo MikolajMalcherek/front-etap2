@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User, UserService } from '../../services/user.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AfterViewInit } from '@angular/core';
 import { ChatService, Chat } from '../../services/chat.service';
 import { Message, MessageResponse } from '../../services/message.service';
 import { FormsModule } from '@angular/forms';
 import { WebsocketService } from '../../services/websocket.service';
 import { TokenService } from '../../services/token.service';
-
+import {HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @Component({
   selector: 'app-main-view',
@@ -34,11 +34,13 @@ export class MainViewComponent implements OnInit, AfterViewInit{
     private chatService: ChatService,
     private websocketService: WebsocketService,
     private tokenService: TokenService,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
 
   ngOnInit(): void {
     console.log("Inside main view");
+    // console.log("Token in main view: ", this.tokenService.getToken())
 
     this.userService.getUsername().subscribe((username) => {
       this.username = username;
@@ -48,7 +50,7 @@ export class MainViewComponent implements OnInit, AfterViewInit{
     this.loadUsers();
 
     if (this.username) {
-      console.log('Returned user:');
+      // console.log('Returned user:');
       this.userService.getUser(this.username).subscribe(
         (user) => {
           // Once the user is found, assign the user id to this.userid
