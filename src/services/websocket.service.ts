@@ -1,40 +1,56 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import SockJS from 'sockjs-client';
-import * as Stomp from 'stompjs';
+import { Client, StompConfig } from '@stomp/stompjs'; 
 import { TokenService } from './token.service';
+import { ApprulService } from './apprul.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WebsocketService {
-  private stompClient: Stomp.Client | undefined;
+  private stompClient: Client | undefined;
   private messagesSubject: Subject<any> = new Subject<any>();
+  
 
-  constructor(private tokenService: TokenService) {
-    this.connect();
+  constructor(private tokenService: TokenService,
+    private appurlService: ApprulService
+  ) {
+ 
   }
 
-  connect() {
-    const token = this.tokenService.getToken() // Ensure the token is fetched
-    const socket = new SockJS('http://localhost:8080/websocket');
-    this.stompClient = Stomp.over(socket);
-    // console.log("Token in socket:", token);
+  connect(chatId: number): void {
+    const token = this.tokenService.getToken(); // Pobranie tokena
+    const socketUrl = this.appurlService.getActualBackendUrl() + 'websocket'; // Adres serwera WebSocket
 
-    this.stompClient.connect(
-      {
-        Authorization: `Bearer ${token}`,  // Send token with the WebSocket connection
+    console.log("Inside connect function")
+
+    if (this.stompClient && this.stompClient.connected) {
+      console.warn('Already connected to WebSocket. Disconnecting first...');
+      this.disconnect(); // Rozłączenie przed nowym połączeniem
+    }
+
+    // Inicjalizacja klienta STOMP
+    this.stompClient = new Client({
+      webSocketFactory: () => new SockJS(socketUrl), // Połączenie SockJS
+      connectHeaders: {
+        Authorization: `Bearer ${token}`, // Przekazanie tokena
       },
-      () => {
-        console.log('Connected to WebSocket');
-        // If you want to subscribe to a chat, you can do that after connection
-        // this.subscribeToChat(chatId);
+      debug: (str) => console.log(str), // Debugowanie połączenia
+      reconnectDelay: 5000, // Automatyczne ponowne połączenie
+      onConnect: () => {
+        console.log(`Connected to WebSocket`);
+        this.subscribeToChat(chatId);
       },
-      (error) => {
-        console.error('WebSocket connection error:', error);
-      }
-    );
+      onStompError: (frame) => {
+        console.error('STOMP Error:', frame);
+      },
+    });
+
+    // Aktywacja klienta
+    this.stompClient.activate();
   }
+
   sendMessage(chatId: number, senderId: number, receiverId: number, message: string) {
     const payload = {
       message,
@@ -42,8 +58,11 @@ export class WebsocketService {
       receiverId,
     };
 
-    if (this.stompClient) {
-      this.stompClient.send(`/app/sendmessage/${chatId}`, {}, JSON.stringify(payload));
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.publish({
+        destination: `/app/sendmessage/${chatId}`,
+        body: JSON.stringify(payload),
+      });
     }
   }
 
@@ -53,20 +72,18 @@ export class WebsocketService {
 
   disconnect() {
     if (this.stompClient) {
-      this.stompClient.disconnect(() => {
-        console.log('Disconnected from WebSocket');
-      });
+      this.stompClient.deactivate();
+      console.log('Disconnected from WebSocket');
     }
   }
 
-    // Subscribe specific chat
-    subscribeToChat(chatId: number) {
-      if (this.stompClient) {
-        this.stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
-          console.log('New message for chat:', message.body);
-          this.messagesSubject.next(JSON.parse(message.body));
-        });
-      }
+  subscribeToChat(chatId: number) {
+    if (this.stompClient) {
+      console.log("Subribing chat...")
+      this.stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
+        console.log('New message for chat:', message.body);
+        this.messagesSubject.next(JSON.parse(message.body));
+      });
     }
-
+  }
 }

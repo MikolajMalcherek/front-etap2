@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { TokenService } from '../../services/token.service';
 import {HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApprulService } from '../../services/apprul.service';
 
 interface TokenResponse {
   access_token: string;
@@ -29,6 +30,7 @@ export class CallbackComponent{
     @Inject(PLATFORM_ID) private platformId: Object,
     private userService: UserService,
     private tokenService: TokenService,
+    private appurlService: ApprulService,
   ) { }
 
   ngOnInit(): void {
@@ -36,12 +38,16 @@ export class CallbackComponent{
     this.route.queryParams.subscribe(params => {
       const code = params['code'];
       console.log('Received code: ', code);
+      if(code == null){
+        console.log("Empty code!")
+      }
       if (code) {
-        this.http.get<TokenResponse>('http://localhost:8080/callback', {
+        const url = this.appurlService.getActualBackendUrl() + 'callback'
+        this.http.get<TokenResponse>(url, {
           params: {code},
         })
           .subscribe(response => {
-            // console.log('Backend response: ', response);
+            console.log('Backend response: ', response);
 
             const token = response.access_token;
             const refresh_token = response.refresh_token;
@@ -60,8 +66,9 @@ export class CallbackComponent{
             const username = this.getUsernameFromToken(token);
             
             if (username) {
+              const usercreateurl = this.appurlService.getActualBackendUrl() + 'api/users/create' 
               this.userService.setUsername(username);
-              this.http.post<TokenResponse>('http://localhost:8080/api/users/create', {
+              this.http.post<TokenResponse>(usercreateurl, {
                 username: username
               })
               .subscribe(
@@ -81,11 +88,11 @@ export class CallbackComponent{
             this.isLoading = false; // Wyłącz spinner po zakończeniu ładowania
           }, error => {
             console.error('Error during token exchange: ', error);
-            this.redirectToBadLogin();
+            // this.redirectToBadLogin();
             this.isLoading = false; // Wyłącz spinner po błędzie
           });
       } else {
-        this.redirectToBadLogin();
+        // this.redirectToBadLogin();
         this.isLoading = false; // Wyłącz spinner, jeśli brak kodu
       }
     });
@@ -94,10 +101,10 @@ export class CallbackComponent{
   private redirectToBadLogin(): void {
     const clientId = '4u16sf8bhgdvjdf01b3uccgo8u';
     const logoutUrl = `https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout`;
-    const redirectUri = `http://localhost:4200/bad-login`;
+    const redirectUri = this.appurlService.getActualFrontendUrl() + 'bad-login';
 
     if (isPlatformBrowser(this.platformId)) {
-      const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?response_type=code&client_id=1gqfmkoltk4vqlqriqubp3pd5c&logout_uri=http://localhost:4200/bad-login';
+      const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?response_type=code&client_id=1gqfmkoltk4vqlqriqubp3pd5c&logout_uri=' + redirectUri;
       window.location.href = logoutUrl;
     }
   }

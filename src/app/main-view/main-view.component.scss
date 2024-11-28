@@ -202,25 +202,23 @@ body {
 }
 
 .sent {
-  display: inline-flex; /* Dopasowuje szerokość tła do tekstu */
-  text-align: right;
+  align-self: flex-end;
   background-color: #70dcf8;
   padding: 8px 15px;
   margin: 5px;
   border-radius: 8px;
-  max-width: 100%; /* Zapewnia, że element nie wyjdzie poza kontener */
+  max-width: 70%; /* Zapewnia, że element nie wyjdzie poza kontener */
   word-wrap: break-word; /* Zapobiega zawijaniu się tekstu na zewnątrz */
 }
 
 .received {
-  display: inline-flex; /* Dopasowuje szerokość tła do tekstu */
-  text-align: right;
+  align-self: flex-start; /* Wypchnięcie na lewą stronę */
   background-color: rgb(181, 250, 189);
   padding: 8px 15px;
   margin: 5px;
   border-radius: 8px;
-  max-width: 100%; /* Zapewnia, że element nie wyjdzie poza kontener */
-  word-wrap: break-word; /* Zapobiega zawijaniu się tekstu na zewnątrz */
+  max-width: 70%; /* Ograniczenie szerokości */
+  word-wrap: break-word; /* Zawijanie tekstu */
 }
 
 .chat-input {

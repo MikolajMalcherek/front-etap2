@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { WebsocketService } from '../../services/websocket.service';
 import { TokenService } from '../../services/token.service';
 import {HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApprulService } from '../../services/apprul.service';
 
 @Component({
   selector: 'app-main-view',
@@ -35,11 +36,12 @@ export class MainViewComponent implements OnInit, AfterViewInit{
     private websocketService: WebsocketService,
     private tokenService: TokenService,
     @Inject(PLATFORM_ID) private platformId: Object,
+    private appurlService: ApprulService,
   ) {}
 
 
   ngOnInit(): void {
-    console.log("Inside main view");
+    console.log("Inside main view - chat menu");
     // console.log("Token in main view: ", this.tokenService.getToken())
 
     this.userService.getUsername().subscribe((username) => {
@@ -95,7 +97,7 @@ export class MainViewComponent implements OnInit, AfterViewInit{
   
 
   beginChat(user: User): void {
-    this.websocketService.disconnect();
+    // this.websocketService.disconnect();
     console.log("Clicked user:", user.username);
     console.log("Username: ", user.username);
     console.log("id: ", user.id);
@@ -110,7 +112,10 @@ export class MainViewComponent implements OnInit, AfterViewInit{
           this.selectedUser = user;
           console.log("Messages for selected chat: ",this.messages);
 
-          this.websocketService.subscribeToChat(this.chat.id);
+          // this.websocketService.subscribeToChat(this.chat.id);
+          if(this.chat?.id){
+            this.websocketService.connect(this.chat.id);
+          }
         },
         (error) => {
           console.error('Error starting chat:', error);
@@ -119,7 +124,8 @@ export class MainViewComponent implements OnInit, AfterViewInit{
     } else {
       console.error('User ID or logged-in ID is missing');
     }
-    this.websocketService.connect();
+
+
     console.log("Token in sessionStorage: ",this.tokenService.getToken())
   }
 
@@ -154,7 +160,7 @@ export class MainViewComponent implements OnInit, AfterViewInit{
   }
 
   logout(): void {
-    const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?response_type=code&client_id=1gqfmkoltk4vqlqriqubp3pd5c&logout_uri=http://localhost:4200/loginclick';
+    const logoutUrl = 'https://aplikacjachat.auth.us-east-1.amazoncognito.com/logout?response_type=code&client_id=1gqfmkoltk4vqlqriqubp3pd5c&logout_uri=' + this.appurlService.getActualFrontendUrl() + 'loginclick';
       window.location.href = logoutUrl;
       this.tokenService.removeToken();
   }

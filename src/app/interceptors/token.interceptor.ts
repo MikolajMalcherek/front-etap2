@@ -8,7 +8,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const token = tokenService.getToken();
 
   // Sprawdzenie, czy zapytanie nie jest na endpoint /callback
-  if (req.url.includes('/callback')) {
+  if (req.url.includes('/callback') || req.url.includes('/websocket')) {
     return next(req);  // Po prostu zwróć oryginalne zapytanie bez dodawania tokenu
   }
 

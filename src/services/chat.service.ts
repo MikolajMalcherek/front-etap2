@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Message, MessageResponse } from './message.service'
+import { ApprulService } from './apprul.service';
 
 export interface Chat {
   id: number;
@@ -15,10 +16,14 @@ export interface Chat {
   providedIn: 'root'
 })
 export class ChatService {
+  private apiUrl: string;
 
-  private apiUrl = 'http://localhost:8080/api/chats/beginchat'
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private appurlService: ApprulService,
+  )
+   { 
+    this.apiUrl = appurlService.getActualBackendUrl() + 'api/chats/beginchat'
+  }
 
   beginChat(user1Id: number, user2Id: number): Observable<Chat> {
     return this.http.get<Chat>(`${this.apiUrl}?user1Id=${user1Id}&user2Id=${user2Id}`);

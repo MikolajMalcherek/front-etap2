@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ApprulService } from './apprul.service';
 
 export interface User {
   id: number;
@@ -11,21 +12,27 @@ export interface User {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8080/api/users'
-
+  private apiUrl: string;
 
   // BehaviorSubject do przechowywania i udostępniania username
   private usernameSource = new BehaviorSubject<string | null>(null);
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private appUrlService: ApprulService
+  ) { 
+      this.apiUrl = this.appUrlService.getActualBackendUrl() + 'api/users'
+  }
+
+
 
   getAllUsers(): Observable<User[]> {
-    console.log('Sending request to backend...');
+    console.log('Sending request to backend to adress: ', this.apiUrl);
     return this.http.get<User[]>(this.apiUrl);
   }
 
   getUser(username: string): Observable<User> {
     const url = `${this.apiUrl}/getuser?username=${username}`;
+    console.log('Sending request to backend to adress: ', url)
     return this.http.get<User>(url);
   }
 
