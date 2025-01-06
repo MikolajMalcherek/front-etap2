@@ -27,9 +27,12 @@ COPY --from=build /app/dist/chat-app-frontend /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Skopiowanie certyfikatów SSL do kontenera
-COPY ./ssl.crt /etc/ssl/certs/ssl.crt
-COPY ./ssl.key /etc/ssl/private/ssl.key
+COPY ./loadbalancer.crt /etc/ssl/certs/loadbalancer.crt
+COPY ./loadbalancer.key /etc/ssl/private/loadbalancer.key
+COPY ./certpassPhrase /etc/nginx/certpassPhrase
 
+# Ustaw odpowiednie uprawnienia dla pliku z hasłem
+RUN chmod 600 /etc/nginx/certpassPhrase
 
 # Eksponuj port 80
 EXPOSE 80 443

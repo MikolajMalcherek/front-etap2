@@ -20,8 +20,9 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
         Authorization: `Bearer ${token}`
       }
     });
+    console.log("There is a token to add to a request - frontend.")
     return next(authReq);
   }
-
+  console.log("There is no a token to add to a request - frontend!!!")
   return next(req);
 };

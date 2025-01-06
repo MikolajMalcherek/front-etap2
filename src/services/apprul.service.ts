@@ -5,14 +5,14 @@ import { Injectable } from '@angular/core';
 })
 export class ApprulService {
 
-  private localfronturl = 'https://localhost:4200/'
-  private localbackendurl = 'https://localhost:8080/'
+  private localfronturl = 'https://localhost:443/front/'
+  private localbackendurl = 'https://localhost:8081/'
 
-  private ec2frontendurl = 'https://50.16.52.223:443/'
-  private ec2backendurl = 'https://100.29.24.217:8080/'
+  private ec2frontendurl = 'https://message-app-1932806518.us-east-1.elb.amazonaws.com:443/front/'
+  private ec2backendurl = 'https://message-app-1932806518.us-east-1.elb.amazonaws.com:8081/'
 
   private actualfrontendurl = this.ec2frontendurl;
-  private actualbackendurl = this.ec2backendurl;
+  private actualbackendurl = this.localbackendurl;
 
   constructor() { }
 

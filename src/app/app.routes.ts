@@ -7,9 +7,15 @@ import { BadLoginComponent } from './bad-login/bad-login.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 
 export const routes: Routes = [
+    {
+    path: 'front',
+    children: [
     { path: 'loginclick', component: LoginClickComponent },
     { path: 'callback', component: CallbackComponent },
     { path: 'main-view', component: MainViewComponent },
     {path: 'bad-login', component:BadLoginComponent},
     {path: 'signup', component: SignUpComponent},
+    ],
+    },
+    {path: '**', redirectTo: 'front' },
 ];

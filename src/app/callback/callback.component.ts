@@ -34,7 +34,7 @@ export class CallbackComponent{
   ) { }
 
   ngOnInit(): void {
-    console.log("Inside callback page");
+    console.log("Inside callback page, trying to log in");
     this.route.queryParams.subscribe(params => {
       const code = params['code'];
       console.log('Received code: ', code);
@@ -68,23 +68,30 @@ export class CallbackComponent{
             if (username) {
               const usercreateurl = this.appurlService.getActualBackendUrl() + 'api/users/create' 
               this.userService.setUsername(username);
-              this.http.post<TokenResponse>(usercreateurl, {
+              this.http.post<{message: string}>(usercreateurl, {
                 username: username
               })
               .subscribe(
                 response => {
                   // Obsługuje odpowiedź
                   console.log("Token z session storage",this.tokenService.getToken())
-                  console.log('User created:');
+                  console.log('User created:', response.message);
                 },
                 error => {
-                  // Obsługuje błąd
-                  console.error('User exists already');
+                  if (error.status === 409) {
+                    console.error('User exists already - frontend comunicate');
+                    const errorMessage = error.error?.message || 'User already exists - default message';
+                    console.error('Conflict:', errorMessage);
+                    // Wyświetl komunikat o istniejącym użytkowniku
+                  } else {
+                    console.error('Unexpected error:', error);
+                  }
                 }
               );
             }
 
-            this.router.navigate(['/main-view']);
+            console.log('Navigating to main view...');
+            this.router.navigate(['/front/main-view']);
             this.isLoading = false; // Wyłącz spinner po zakończeniu ładowania
           }, error => {
             console.error('Error during token exchange: ', error);
